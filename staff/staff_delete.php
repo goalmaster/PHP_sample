@@ -1,3 +1,21 @@
+<?php
+session_start();
+session_regenerate_id(true);
+if(isset($_SESSION['login']) == false)
+{
+    print 'ログインされていません。<br />';
+    print '<a href="../staff_login/staff_login.html">ログイン画面へ</a>';
+    exit();
+}
+else
+{
+    print $_SESSION['staff_name'];
+    print 'さんログイン中<br />';
+    print '<br />';
+}
+
+?>
+
 <!DOCTYPE html>
 <html>
     <head>
@@ -11,7 +29,7 @@
         try
         {
 
-            $staff_code = $_POST['staffcode'];
+            $staff_code = $_GET['staffcode'];
             
             $dsn = 'mysql:dbname=shop;host=localhost;charset=utf8';
             $user = 'root';
@@ -38,23 +56,18 @@
         
         ?>
 
-        スタッフ修正<br /><br />
+        スタッフ削除<br />
+        <br />
         スタッフコード<br />
         <?php print $staff_code; ?>
         <br />
+        スタッフ名<br />
+        <?php print $staff_name; ?>
         <br />
-        <form method="post" action="staff_edit_check.php">
+        このスタッフを削除してよろしいですか？<br />
+        <br />
+        <form method="post" action="staff_delete_done.php">
             <input type="hidden" name="code" value="<?php print $staff_code; ?>">
-            スタッフ名<br />
-            <input type="text" name="name" style="width:200px" value="<?php print $staff_name; ?>">
-            <br />
-            パスワードを入力してください。<br />
-            <input type="password" name="pass" style="width:100px">
-            <br />
-            パスワードをもう1度入力してください。<br />
-            <input type="password" name="pass2" style="width:100px">
-            <br />
-            <br />
             <input type="button" onclick="history.back()" value="戻る">
             <input type="submit" value="OK">
         </form>
