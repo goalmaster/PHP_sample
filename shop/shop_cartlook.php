@@ -26,9 +26,12 @@ else
     <body>
 
         <?php
-
+        
         try
         {
+
+            $cart = $_SESSION['cart'];
+            $max = count($cart);
 
             $dsn = 'mysql:dbname=shop;host=localhost;charset=utf8';
             $user = 'root';
@@ -36,38 +39,51 @@ else
             $dbh = new PDO($dsn, $user, $password);
             $dbh->setAttribute(PDO::ATTR_ERRMODE,PDO::ERRMODE_EXCEPTION);
 
-            $sql = 'SELECT code,name,price FROM mst_product WHERE 1';
-            $stmt = $dbh->prepare($sql);
-            $stmt->execute();
+            foreach($cart as $key => $val)
+            {
+                $sql = 'SELECT code,name,price,photo FROM mst_product WHERE code=?';
+                $stmt = $dbh->prepare($sql);
+                $data[0] = $val;
+                $stmt->execute($data);
 
+                $rec = $stmt->fetch(PDO::FETCH_ASSOC);
+
+                $pro_name[] = $rec['name'];
+                $pro_price[] = $rec['price'];
+                if($rec['photo'] == '')
+                {
+                    $pro_photo[] = '';
+                }
+                else
+                {
+                    $pro_photo[] = '<img src="../product/photo/'.$rec['photo'].'">';
+                }
+            }
             $dbh = null;
 
-            print '商品一覧<br /><br />';
-
-            while(true)
-            {
-                $rec = $stmt->fetch(PDO::FETCH_ASSOC);
-                if($rec==false)
-                {
-                    break;
-                }
-                print '<a href="shop_product.php?procode='.$rec['code'].'">';
-                print $rec['name'].'---';
-                print $rec['price'].'円';
-                print '</a>';
-                print '<br />';
-            }
-
-            print '<br />';
-            print '<a href="shop_cartlook.php">カートを見る</a><br />';
         }
         catch(Exception $e)
         {
             print 'ただいま障害により大変ご迷惑をお掛けしております。';
             exit();
         }
-
+        
         ?>
+
+        カートの中身<br />
+        <br />
+        <?php
+            for($i = 0; $i < $max; $i++)
+                {
+                    print $pro_name[$i];
+                    print $pro_photo[$i];
+                    print $pro_price[$i].'円';
+                    print '<br />';
+                }
+        ?>
+        <form>
+            <input type="button" onclick="history.back()" value="戻る">
+        </form>
 
     </body>
 </html>
